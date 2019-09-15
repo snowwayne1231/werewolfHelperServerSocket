@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      form { padding: 5px; width: 100%; }
+      form button { width: 15%; border: 2px outset #333; padding: 20px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      #m { width: 80%; height: 300px; }
+      #result {width: 90%; height: 300px; margin: 0 auto;}
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form action="" id="fform">
+      <textarea id="m" autocomplete="off" wrap="soft"></textarea>
+      <button>Send</button>
+    </form>
+    <textarea id="result">
+      type = create, join, broadcast, getroomlist
+      create[password, setting]
+      getroomlist[]
+      join[room_id, password]
+    </textarea>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var fform = document.getElementById('fform');
+        var textarea = document.getElementById('m');
+        textarea.value = JSON.stringify({type:'create', password: 1234});
+
+        fform.onsubmit = function(e) {
+            e.preventDefault(); // prevents page reloading
+            var val = textarea.value;
+            
+            try {
+                var json = JSON.parse(val);
+                if (json) {
+                    socket.emit('message', JSON.stringify(json));
+                }
+            } catch(e) {
+                console.log(val, e);
+                alert('json wrong format.');
+            }
+            
+            return false;
+        }
+
+        socket.on('message', function(msg){
+          console.log('socket on message', msg);
+          if (msg.payload) {
+            document.getElementById('result').value = JSON.stringify(msg.payload);
+          } else if (msg.error) {
+            alert(msg.error);
+          }
+        });
+    </script>
+  </body>
+</html>
