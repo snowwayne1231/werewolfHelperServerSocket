@@ -4,6 +4,7 @@ var io = require('socket.io')(http);
 var now_room_id = 1;
 var room_list = [];
 var socket_list = [];
+var port = 80;
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -100,8 +101,8 @@ io.on('connection', function(socket){
   });
 });
 
-http.listen(80, function(){
-  console.log('listening on *:80');
+http.listen(process.env.PORT || port, function(){
+  console.log('werewolf socket start.');
 });
 
 
