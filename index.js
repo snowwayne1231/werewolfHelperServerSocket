@@ -4,7 +4,7 @@ var io = require('socket.io')(http);
 var now_room_id = 1;
 var room_list = [];
 var socket_list = [];
-var port = 80;
+var port = 8030;
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -36,7 +36,7 @@ io.on('connection', function(socket){
                 gameSetting: json.setting,
                 gameData: {
                     isNight: false,
-                    gameRound: 1,
+                    round: 1,
                     process: 0,
                     playerLeft: [],
                     playerRight: [],
@@ -44,11 +44,12 @@ io.on('connection', function(socket){
                     witchesPoisonTarget: -1,
                     witchesHealth: true,
                     lastTimeGuard: -1,
+                    ...json.data,
                 },
                 timestamp,
             }
 
-            room_list = room_list.filter(room => (room.timestamp + 10800000) < timestamp);
+            room_list = room_list.filter(room => (room.timestamp + 10800000) > timestamp);
             room_list.push(room_obj);
             
             now_room_id++;
@@ -62,7 +63,10 @@ io.on('connection', function(socket){
             if (room) {
               if (room.password == password) {
                 socket.join_room_id = room_id;
-                json.payload = room.gameData;
+                json.payload = {
+                  data: room.gameData,
+                  setting: room.gameSetting,
+                };
                 send(socket, json);
               } else {
                 sendError(socket, '錯誤的密碼');
@@ -91,7 +95,7 @@ io.on('connection', function(socket){
             
             break;
         case 'getroomlist':
-            var roomlist = room_list.filter(r => r.host_socket != socket).map(r => r.id);
+            var roomlist = room_list.map(r => r.id);
             json.payload = roomlist;
             send([socket], json);
             break;
