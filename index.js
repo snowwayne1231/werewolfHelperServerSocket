@@ -4,7 +4,7 @@ var io = require('socket.io')(http);
 var now_room_id = 1;
 var room_list = [];
 var socket_list = [];
-var port = 8030;
+var port = 80;
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
