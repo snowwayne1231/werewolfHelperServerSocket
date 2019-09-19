@@ -82,7 +82,11 @@ io.on('connection', function(socket){
               var room = room_list.find(r => r.id == my_room_id);
               if (room) {
                 room.gameData = json.data;
-                var sameRoomSockets = socket_list.filter(s => s.room_id == my_room_id || s.join_room_id == my_room_id);
+                var sameRoomSockets = socket_list.filter(s => {
+                  return (s.room_id == my_room_id ||
+                    s.join_room_id == my_room_id) &&
+                    s != socket;
+                });
                 json.payload = room.gameData;
                 send(sameRoomSockets, json);
               } else {
