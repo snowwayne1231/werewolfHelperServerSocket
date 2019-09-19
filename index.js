@@ -94,7 +94,7 @@ io.on('connection', function(socket){
               }
               
             } else {
-              sendError(socket, '未加入房間');
+              // sendError(socket, '未加入房間');
             }
             
             break;
@@ -118,7 +118,7 @@ io.on('connection', function(socket){
               }
               
             } else {
-              sendError(socket, '未加入房間');
+              // sendError(socket, '未加入房間');
             }
             break;
         default:
