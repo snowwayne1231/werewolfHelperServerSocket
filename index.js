@@ -103,6 +103,24 @@ io.on('connection', function(socket){
             json.payload = roomlist;
             send([socket], json);
             break;
+        case 'playmp3':
+            var my_room_id = socket.room_id || socket.join_room_id;
+            if (my_room_id && my_room_id > 0) {
+              var room = room_list.find(r => r.id == my_room_id);
+              if (room) {
+                var sameRoomSockets = socket_list.filter(s => {
+                  return s.room_id == my_room_id;
+                });
+                json.payload = json.key;
+                send(sameRoomSockets, json);
+              } else {
+                sendError(socket, '此房間已經解散');
+              }
+              
+            } else {
+              sendError(socket, '未加入房間');
+            }
+            break;
         default:
     }
     return json;
