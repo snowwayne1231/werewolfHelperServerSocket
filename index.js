@@ -82,13 +82,8 @@ io.on('connection', function(socket){
               var room = room_list.find(r => r.id == my_room_id);
               if (room) {
                 room.gameData = json.data;
-                var sameRoomSockets = socket_list.filter(s => {
-                  return (s.room_id == my_room_id ||
-                    s.join_room_id == my_room_id) &&
-                    s != socket;
-                });
                 json.payload = room.gameData;
-                send(sameRoomSockets, json);
+                send(getSameRoomSockets(my_room_id, socket), json);
               } else {
                 sendError(socket, '此房間已經解散');
               }
@@ -108,17 +103,20 @@ io.on('connection', function(socket){
             if (my_room_id && my_room_id > 0) {
               var room = room_list.find(r => r.id == my_room_id);
               if (room) {
-                var sameRoomSockets = socket_list.filter(s => {
-                  return s.room_id == my_room_id;
-                });
                 json.payload = json.key;
-                send(sameRoomSockets, json);
+                send(getRoomHostSockets(my_room_id), json);
               } else {
                 sendError(socket, '此房間已經解散');
               }
               
             } else {
               // sendError(socket, '未加入房間');
+            }
+            break;
+        case 'command':
+            var my_room_id = socket.room_id || socket.join_room_id;
+            if (my_room_id && my_room_id > 0) {
+              send(getSameRoomSockets(my_room_id, socket), json);
             }
             break;
         default:
@@ -142,4 +140,17 @@ function send(sockets, json) {
       return s.send(json);
     })
     : sockets.send(json);
+}
+
+function getSameRoomSockets(room_id, withoutSelfSocket = null, includeGuest = true) {
+  return socket_list.filter(s => {
+    return (s.room_id == room_id || (includeGuest && s.join_room_id == room_id)) &&
+      withoutSelfSocket != s;
+  });
+}
+
+function getRoomHostSockets(room_id) {
+  return socket_list.filter(s => {
+    return s.room_id == room_id;
+  });
 }
