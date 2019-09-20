@@ -49,7 +49,7 @@ io.on('connection', function(socket){
                 timestamp,
             }
 
-            room_list = room_list.filter(room => (room.timestamp + 10800000) > timestamp);
+            room_list = room_list.filter(room => (room.timestamp + 36000000) > timestamp);
             room_list.push(room_obj);
             
             now_room_id++;
@@ -119,6 +119,17 @@ io.on('connection', function(socket){
               send(getSameRoomSockets(my_room_id, socket), json);
             }
             break;
+        case 'reset':
+            var room_id = parseInt(json.room_id, 10);
+            room = room_list.find(r => r.id == room_id);
+            
+            var timestamp = new Date().getTime();
+            room.gameSetting = json.setting;
+            room.gameData = json.data;
+            room.timestamp = timestamp;
+            
+            json.payload = room_id;
+            send(getSameRoomSockets(room_id, socket), json);
         default:
     }
     return json;
