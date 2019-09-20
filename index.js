@@ -145,7 +145,7 @@ function send(sockets, json) {
 function getSameRoomSockets(room_id, withoutSelfSocket = null, includeGuest = true) {
   return socket_list.filter(s => {
     return (s.room_id == room_id || (includeGuest && s.join_room_id == room_id)) &&
-      withoutSelfSocket != s;
+      !(withoutSelfSocket && withoutSelfSocket == s);
   });
 }
 
