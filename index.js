@@ -1,14 +1,34 @@
 var app = require('express')();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+var path = require('path');
 var now_room_id = 1;
 var room_list = [];
 var socket_list = [];
 var port = 80;
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/www/index.html');
 });
+
+app.get('/app.js', function(req, res){
+  res.sendFile(__dirname + '/www/app.js');
+});
+
+app.get('/app.css', function(req, res){
+  res.sendFile(__dirname + '/www/app.css');
+});
+
+app.get('/static/*', staticFile);
+
+app.get('/fonts/*', staticFile);
+
+function staticFile(req, res) {
+  var filePath = '.' + req.url;
+  
+  var nextPath = (__dirname + '/www/' + filePath).replace(/[\/\\]{2}/g, '');
+  res.sendFile(nextPath);
+}
 
 io.on('connection', function(socket){
   
